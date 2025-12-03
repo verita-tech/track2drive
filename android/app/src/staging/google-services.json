@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "338622948818",
+    "project_id": "track2drive-dev",
+    "storage_bucket": "track2drive-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338622948818:android:16393a0898823addcb540b",
+        "android_client_info": {
+          "package_name": "de.rentrop.track2drive.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGyGnXRO8062fEsaA4hgG_vIVfyPnrsiQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
