@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:track2drive/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:track2drive/features/auth/presentation/pages/register_page.dart';
 import 'package:track2drive/features/auth/presentation/pages/reset_password_page.dart';
+import 'package:track2drive/l10n/app_localizations.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -39,8 +40,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: Text(l10n.loginTitle)),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state.error != null) {
@@ -62,18 +65,18 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       TextFormField(
                         controller: _emailCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'E-Mail',
+                        decoration: InputDecoration(
+                          labelText: l10n.eMail,
                           prefixIcon: Icon(Icons.email),
                           border: OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'E-Mail eingeben';
+                            return l10n.enterEMail;
                           }
                           if (!value.contains('@')) {
-                            return 'Ungültige E-Mail';
+                            return l10n.invalidEMail;
                           }
                           return null;
                         },
@@ -82,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
                       TextFormField(
                         controller: _passwordCtrl,
                         decoration: InputDecoration(
-                          labelText: 'Passwort',
+                          labelText: l10n.password,
                           prefixIcon: const Icon(Icons.lock),
                           border: const OutlineInputBorder(),
                           suffixIcon: IconButton(
@@ -96,8 +99,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         obscureText: _obscurePassword,
                         validator: (value) {
-                          if (value == null || value.length < 6) {
-                            return 'Mindestens 6 Zeichen';
+                          if (value == null || value.isEmpty) {
+                            return l10n.enterPassword;
                           }
                           return null;
                         },
@@ -113,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             );
                           },
-                          child: const Text('Passwort vergessen?'),
+                          child: Text(l10n.forgotPassword),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -127,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text('Login'),
+                            : Text(l10n.login),
                       ),
                       const SizedBox(height: 8),
                       TextButton(
@@ -138,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           );
                         },
-                        child: const Text('Noch keinen Account? Registrieren'),
+                        child: Text(l10n.noAccountRegister),
                       ),
                     ],
                   ),

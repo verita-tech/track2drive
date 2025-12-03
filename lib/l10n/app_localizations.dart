@@ -95,23 +95,77 @@ abstract class AppLocalizations {
     Locale('en')
   ];
 
-  /// App title
+  /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
   /// **'Track2Drive'**
   String get appTitle;
 
-  /// Welcome message
+  /// No description provided for @welcome.
   ///
   /// In en, this message translates to:
   /// **'Welcome to Track2Drive'**
   String get welcome;
 
-  /// No description provided for @settings.
+  /// No description provided for @loginTitle.
   ///
   /// In en, this message translates to:
-  /// **'Settings'**
-  String get settings;
+  /// **'Login'**
+  String get loginTitle;
+
+  /// No description provided for @eMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get eMail;
+
+  /// No description provided for @enterEMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter email'**
+  String get enterEMail;
+
+  /// No description provided for @invalidEMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email'**
+  String get invalidEMail;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @enterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter password'**
+  String get enterPassword;
+
+  /// No description provided for @passwordSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum 10 characters, special character, number, uppercase and lowercase letters'**
+  String get passwordSecurity;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password'**
+  String get forgotPassword;
+
+  /// No description provided for @login.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login;
+
+  /// No description provided for @noAccountRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'No account? Register'**
+  String get noAccountRegister;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

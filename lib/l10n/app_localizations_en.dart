@@ -15,5 +15,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcome => 'Welcome to Track2Drive';
 
   @override
-  String get settings => 'Settings';
+  String get loginTitle => 'Login';
+
+  @override
+  String get eMail => 'Email';
+
+  @override
+  String get enterEMail => 'Enter email';
+
+  @override
+  String get invalidEMail => 'Invalid email';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get enterPassword => 'Enter password';
+
+  @override
+  String get passwordSecurity => 'Minimum 10 characters, special character, number, uppercase and lowercase letters';
+
+  @override
+  String get forgotPassword => 'Forgot password';
+
+  @override
+  String get login => 'Login';
+
+  @override
+  String get noAccountRegister => 'No account? Register';
 }

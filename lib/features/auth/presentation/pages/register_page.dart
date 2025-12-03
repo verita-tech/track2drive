@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:track2drive/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:track2drive/l10n/app_localizations.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -32,6 +33,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Registrieren')),
       body: BlocConsumer<AuthBloc, AuthState>(
@@ -81,8 +84,16 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         obscureText: true,
                         validator: (value) {
-                          if (value == null || value.length < 6) {
-                            return 'Mindestens 6 Zeichen';
+                          if (value == null || value.isEmpty) {
+                            return l10n.enterPassword;
+                          }
+                          if (value.length < 10) {
+                            return l10n.passwordSecurity;
+                          }
+                          if (!RegExp(
+                            r'(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])',
+                          ).hasMatch(value)) {
+                            return l10n.passwordSecurity;
                           }
                           return null;
                         },

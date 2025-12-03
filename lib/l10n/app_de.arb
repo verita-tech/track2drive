@@ -1,4 +1,14 @@
 {
   "appTitle": "Track2Drive",
-  "welcome": "Willkommen bei Track2Drive"
+  "welcome": "Willkommen bei Track2Drive",
+  "loginTitle": "Login",
+  "eMail": "E-Mail",
+  "enterEMail": "E-Mail eingeben",
+  "invalidEMail": "Ungültige E-Mail",
+  "password": "Passwort",
+  "enterPassword": "Passwort eingeben",
+  "passwordSecurity": "Mindestens 10 Zeichen, Sonderzeichen, Zahl, Groß- und Kleinbuchstaben",
+  "forgotPassword": "Passwort vergessen",
+  "login": "Login",
+  "noAccountRegister": "Keinen Account? Registrieren."
 }
