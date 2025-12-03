@@ -9,41 +9,95 @@ enum AppEnv { dev, staging, prod }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  final firebaseOptions = _getFirebaseOptions();
+  const String flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
+  final firebaseOptions = _getFirebaseOptions(flavor);
   await Firebase.initializeApp(options: firebaseOptions);
 
-  runApp(const MainApp());
+  runApp(MainApp(flavor: flavor));
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  final String flavor;
+
+  const MainApp({super.key, required this.flavor});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Track2Drive',
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('en'),
-      home: Builder(
-        builder: (context) {
-          final l10n = AppLocalizations.of(context)!;
-          return Scaffold(body: Center(child: Text(l10n.welcome)));
-        },
+      title: 'Track2Drive $flavor',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Track2Drive [$flavor]'),
+          backgroundColor: _getFlavorColor(flavor),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Hello World!',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Environment: $flavor',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Firebase Project: ${_getFirebaseProjectName(flavor)}',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-FirebaseOptions _getFirebaseOptions() {
-  if (kDebugMode) {
-    return dev.DefaultFirebaseOptions.currentPlatform;
+FirebaseOptions _getFirebaseOptions(String flavor) {
+  switch (flavor) {
+    case 'dev':
+      return dev.DefaultFirebaseOptions.currentPlatform;
+    case 'staging':
+      return dev.DefaultFirebaseOptions.currentPlatform;
+    case 'prod':
+      return dev.DefaultFirebaseOptions.currentPlatform;
+    default:
+      if (kDebugMode) {
+        return dev.DefaultFirebaseOptions.currentPlatform;
+      }
+      throw UnimplementedError('No FirebaseOptions for flavor: $flavor');
   }
-  throw UnimplementedError('No FirebaseOptions for this platform');
+}
+
+Color _getFlavorColor(String flavor) {
+  switch (flavor) {
+    case 'dev':
+      return Colors.blue;
+    case 'staging':
+      return Colors.orange;
+    case 'prod':
+      return Colors.green;
+    default:
+      return Colors.grey;
+  }
+}
+
+String _getFirebaseProjectName(String flavor) {
+  switch (flavor) {
+    case 'dev':
+      return 'track2drive-dev';
+    case 'staging':
+      return 'track2drive-staging';
+    case 'prod':
+      return 'track2drive-prod';
+    default:
+      return 'unknown';
+  }
 }

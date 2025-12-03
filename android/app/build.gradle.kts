@@ -24,31 +24,44 @@ android {
     defaultConfig {
         applicationId = "de.rentrop.track2drive"
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
     }
+
+    flavorDimensions += listOf("default")
 
     productFlavors {
         create("dev") {
-            dimension = "environment"
+            dimension = "default"
             applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
         }
         create("staging") {
-            dimension = "environment"
+            dimension = "default"
             applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
         }
         create("prod") {
-            dimension = "environment"
+            dimension = "default"
         }
     }
 
-    buildTypes {
-        getByName("debug") {
-            signingConfig = signingConfigs.getByName("debug")
+    sourceSets {
+        getByName("dev") {
+            manifest.srcFile("src/dev/AndroidManifest.xml")
+            java.srcDirs("src/dev/java")
+            res.srcDirs("src/dev/res")
         }
-        getByName("release") {
-            signingConfig = signingConfigs.getByName("debug")
+        getByName("staging") {
+            manifest.srcFile("src/staging/AndroidManifest.xml")
+            java.srcDirs("src/staging/java")
+            res.srcDirs("src/staging/res")
+        }
+        getByName("prod") {
+            manifest.srcFile("src/prod/AndroidManifest.xml")
+            java.srcDirs("src/prod/java")
+            res.srcDirs("src/prod/res")
         }
     }
 }
