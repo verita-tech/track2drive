@@ -14,6 +14,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    name: flutter ci
 
     steps:
       - uses: actions/checkout@v3
