@@ -15,6 +15,7 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -28,6 +29,12 @@ class _LoginPageState extends State<LoginPage> {
     context.read<AuthBloc>().add(
       AuthLoginRequested(_emailCtrl.text.trim(), _passwordCtrl.text),
     );
+  }
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscurePassword = !_obscurePassword;
+    });
   }
 
   @override
@@ -69,17 +76,25 @@ class _LoginPageState extends State<LoginPage> {
                             return 'Ungültige E-Mail';
                           }
                           return null;
-                        }, // Validierung wie im Flutter‑Cookbook empfohlen.[web:29][web:32]
+                        },
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _passwordCtrl,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Passwort',
-                          prefixIcon: Icon(Icons.lock),
-                          border: OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.lock),
+                          border: const OutlineInputBorder(),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: _togglePasswordVisibility,
+                          ),
                         ),
-                        obscureText: true,
+                        obscureText: _obscurePassword,
                         validator: (value) {
                           if (value == null || value.length < 6) {
                             return 'Mindestens 6 Zeichen';
