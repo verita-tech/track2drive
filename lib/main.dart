@@ -94,10 +94,21 @@ class MainApp extends StatelessWidget {
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.deepPurple,
+            brightness: Brightness.light,
+          ),
           useMaterial3: true,
         ),
-        home: AuthGate(),
+        darkTheme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.deepPurple,
+            brightness: Brightness.dark,
+          ),
+          useMaterial3: true,
+        ),
+        themeMode: ThemeMode.system,
+        home: const AuthGate(),
       ),
     );
   }

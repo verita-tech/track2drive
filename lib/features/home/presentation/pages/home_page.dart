@@ -19,7 +19,7 @@ class HomePage extends StatelessWidget {
             tooltip: 'Logout',
             onPressed: () {
               context.read<AuthBloc>().add(AuthLogoutRequested());
-            }, // Triggert Logout über BLoC.[web:14][web:109]
+            },
           ),
         ],
       ),
