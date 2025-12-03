@@ -1,4 +1,4 @@
-package com.example.track2drive
+package de.rentrop.track2drive
 
 import io.flutter.embedding.android.FlutterActivity
 

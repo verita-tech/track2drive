@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.track2drive"
+    namespace = "de.rentrop.track2drive"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -23,21 +23,46 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.track2drive"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        applicationId = "de.rentrop.track2drive"
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
     }
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+    flavorDimensions += listOf("default")
+
+    productFlavors {
+        create("dev") {
+            dimension = "default"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+        }
+        create("staging") {
+            dimension = "default"
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+        }
+        create("prod") {
+            dimension = "default"
+        }
+    }
+
+    sourceSets {
+        getByName("dev") {
+            manifest.srcFile("src/dev/AndroidManifest.xml")
+            java.srcDirs("src/dev/java")
+            res.srcDirs("src/dev/res")
+        }
+        getByName("staging") {
+            manifest.srcFile("src/staging/AndroidManifest.xml")
+            java.srcDirs("src/staging/java")
+            res.srcDirs("src/staging/res")
+        }
+        getByName("prod") {
+            manifest.srcFile("src/prod/AndroidManifest.xml")
+            java.srcDirs("src/prod/java")
+            res.srcDirs("src/prod/res")
         }
     }
 }
