@@ -14,7 +14,7 @@ class AuthGate extends StatelessWidget {
         if (state.user == null) {
           return const LoginPage();
         }
-        return const HomePage();
+        return HomePage(user: state.user!);
       },
     );
   }
