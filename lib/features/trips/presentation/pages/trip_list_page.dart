@@ -34,7 +34,7 @@ class TripListPage extends StatelessWidget {
               final trip = state.trips[index];
               return TripListItem(
                 trip: trip,
-                onTap: () => _openEdit(context, trip),
+                onEdit: () => _openEdit(context, trip),
                 onDelete: () =>
                     context.read<TripBloc>().add(TripDeleted(trip.id)),
               );
@@ -53,14 +53,22 @@ class TripListPage extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) {
-        return TripForm(
-          onSubmit: (trip) {
-            context.read<TripBloc>().add(
-              TripSubmitted(trip: trip.copyWith(id: ''), isEdit: false),
-            );
-            Navigator.of(context).pop();
-          },
+      builder: (sheetContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+            bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 16,
+          ),
+          child: TripForm(
+            onSubmit: (trip) {
+              context.read<TripBloc>().add(
+                TripSubmitted(trip: trip, isEdit: false),
+              );
+              Navigator.of(sheetContext).pop();
+            },
+          ),
         );
       },
     );
@@ -70,15 +78,23 @@ class TripListPage extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) {
-        return TripForm(
-          initialTrip: trip,
-          onSubmit: (updated) {
-            context.read<TripBloc>().add(
-              TripSubmitted(trip: updated, isEdit: true),
-            );
-            Navigator.of(context).pop();
-          },
+      builder: (sheetContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+            bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 16,
+          ),
+          child: TripForm(
+            initialTrip: trip,
+            onSubmit: (updated) {
+              context.read<TripBloc>().add(
+                TripSubmitted(trip: updated, isEdit: true),
+              );
+              Navigator.of(sheetContext).pop();
+            },
+          ),
         );
       },
     );

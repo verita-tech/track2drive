@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:track2drive/features/auth/domain/entities/user_entity.dart';
 import 'package:track2drive/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:track2drive/features/home/presentation/widgets/home_header.dart';
+import 'package:track2drive/features/home/presentation/widgets/home_recent_trips.dart';
+import 'package:track2drive/features/home/presentation/widgets/home_trip_summary_card.dart';
 import 'package:track2drive/features/trips/presentation/bloc/trip_bloc.dart';
 import 'package:track2drive/features/trips/presentation/pages/trip_list_page.dart';
 
-// Trip-Usecases importieren
 import 'package:track2drive/features/trips/domain/usecases/create_trip_usecase.dart';
 import 'package:track2drive/features/trips/domain/usecases/update_trip_usecase.dart';
 import 'package:track2drive/features/trips/domain/usecases/delete_trip_usecase.dart';
@@ -22,7 +24,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    final email = widget.user.email ?? 'Unbekannt';
+    final email = widget.user.email;
 
     return BlocProvider(
       create: (context) => TripBloc(
@@ -51,7 +53,13 @@ class _HomeScaffoldState extends State<_HomeScaffold> {
   @override
   Widget build(BuildContext context) {
     final pages = <Widget>[
-      _HomeDashboard(email: widget.email),
+      HomeDashboard(
+        // ohne Unterstrich, siehe Klasse unten
+        email: widget.email,
+        onShowAllTrips: () {
+          setState(() => _selectedIndex = 1);
+        },
+      ),
       const TripListPage(),
       const Center(child: Text('Kostenstellenverwaltung (coming soon)')),
       const Center(child: Text('Fahrzeugverwaltung (coming soon)')),
@@ -108,19 +116,28 @@ class _HomeScaffoldState extends State<_HomeScaffold> {
   }
 }
 
-class _HomeDashboard extends StatelessWidget {
-  const _HomeDashboard({required this.email});
+class HomeDashboard extends StatelessWidget {
+  const HomeDashboard({
+    super.key,
+    required this.email,
+    required this.onShowAllTrips,
+  });
+
   final String email;
+  final VoidCallback onShowAllTrips;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Padding(
+      padding: const EdgeInsets.all(16),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Angemeldet als: $email'),
+          HomeHeader(email: email),
           const SizedBox(height: 16),
-          const Text('Willkommen bei Track2Drive!'),
+          const HomeTripSummaryCard(),
+          const SizedBox(height: 24),
+          Expanded(child: HomeRecentTrips(onShowAll: onShowAllTrips)),
         ],
       ),
     );
