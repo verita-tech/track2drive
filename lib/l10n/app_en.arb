@@ -1,4 +1,21 @@
 {
   "appTitle": "Track2Drive",
-  "welcome": "Welcome to Track2Drive"
+  "welcome": "Welcome to Track2Drive",
+  "loginTitle": "Login",
+  "eMail": "Email",
+  "enterEMail": "Enter email",
+  "invalidEMail": "Invalid email",
+  "password": "Password",
+  "enterPassword": "Enter password",
+  "passwordSecurity": "Minimum 10 characters, special character, number, uppercase and lowercase letters",
+  "forgotPassword": "Forgot password",
+  "login": "Login",
+  "noAccountRegister": "No account? Register",
+  "register": "Register",
+  "repeatPassword": "Repeat password",
+  "passwordsNotMatching": "Passwords not matching",
+  "createAccount": "Create Account",
+  "enterEmailForReset": "Enter your email address to receive a reset link.",
+  "sendResetLink":  "Send link",
+  "resetEmailSentMessage": "An email to reset the settings has been sent."
 }

@@ -95,23 +95,119 @@ abstract class AppLocalizations {
     Locale('en')
   ];
 
-  /// App title
+  /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
   /// **'Track2Drive'**
   String get appTitle;
 
-  /// Welcome message
+  /// No description provided for @welcome.
   ///
   /// In en, this message translates to:
   /// **'Welcome to Track2Drive'**
   String get welcome;
 
-  /// No description provided for @settings.
+  /// No description provided for @loginTitle.
   ///
   /// In en, this message translates to:
-  /// **'Settings'**
-  String get settings;
+  /// **'Login'**
+  String get loginTitle;
+
+  /// No description provided for @eMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get eMail;
+
+  /// No description provided for @enterEMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter email'**
+  String get enterEMail;
+
+  /// No description provided for @invalidEMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email'**
+  String get invalidEMail;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @enterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter password'**
+  String get enterPassword;
+
+  /// No description provided for @passwordSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum 10 characters, special character, number, uppercase and lowercase letters'**
+  String get passwordSecurity;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password'**
+  String get forgotPassword;
+
+  /// No description provided for @login.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login;
+
+  /// No description provided for @noAccountRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'No account? Register'**
+  String get noAccountRegister;
+
+  /// No description provided for @register.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get register;
+
+  /// No description provided for @repeatPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat password'**
+  String get repeatPassword;
+
+  /// No description provided for @passwordsNotMatching.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords not matching'**
+  String get passwordsNotMatching;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccount;
+
+  /// No description provided for @enterEmailForReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email address to receive a reset link.'**
+  String get enterEmailForReset;
+
+  /// No description provided for @sendResetLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Send link'**
+  String get sendResetLink;
+
+  /// No description provided for @resetEmailSentMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'An email to reset the settings has been sent.'**
+  String get resetEmailSentMessage;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -1,4 +1,21 @@
 {
   "appTitle": "Track2Drive",
-  "welcome": "Willkommen bei Track2Drive"
+  "welcome": "Willkommen bei Track2Drive",
+  "loginTitle": "Login",
+  "eMail": "E-Mail",
+  "enterEMail": "E-Mail eingeben",
+  "invalidEMail": "Ungültige E-Mail",
+  "password": "Passwort",
+  "enterPassword": "Passwort eingeben",
+  "passwordSecurity": "Mindestens 10 Zeichen, Sonderzeichen, Zahl, Groß- und Kleinbuchstaben",
+  "forgotPassword": "Passwort vergessen",
+  "login": "Login",
+  "noAccountRegister": "Keinen Account? Registrieren.",
+  "register": "Registrieren",
+  "repeatPassword": "Passwort wiederholen",
+  "passwordsNotMatching": "Passwörter stimmen nicht überein",
+  "createAccount": "Account erstellen",
+  "enterEmailForReset": "Geben Sie Ihre E-Mail ein, um einen Link zum Zurücksetzen zu erhalten.",
+  "sendResetLink":  "Link senden",
+  "resetEmailSentMessage": "E-Mail zum Zurücksetzen wurde gesendet."
 }
