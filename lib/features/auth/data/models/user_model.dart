@@ -5,9 +5,6 @@ class UserModel extends UserEntity {
   const UserModel({required super.id, required super.email});
 
   factory UserModel.fromFirebase(User user) {
-    return UserModel(
-      id: user.uid,
-      email: user.email ?? '',
-    ); // Mappt Firebase‑User auf deine Entity.[web:82]
+    return UserModel(id: user.uid, email: user.email ?? '');
   }
 }

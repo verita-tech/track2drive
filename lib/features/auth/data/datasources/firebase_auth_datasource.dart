@@ -19,7 +19,7 @@ class FirebaseAuthDataSourceImpl implements FirebaseAuthDataSource {
     final credential = await _firebaseAuth.signInWithEmailAndPassword(
       email: email,
       password: password,
-    ); // Standard Email/Pass‑Login.[web:2][web:83]
+    );
     final user = credential.user!;
     return UserModel.fromFirebase(user);
   }
@@ -29,27 +29,25 @@ class FirebaseAuthDataSourceImpl implements FirebaseAuthDataSource {
     final credential = await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
-    ); // Registrierung.[web:2][web:15]
+    );
     final user = credential.user!;
     return UserModel.fromFirebase(user);
   }
 
   @override
   Future<void> sendPasswordResetEmail(String email) {
-    return _firebaseAuth.sendPasswordResetEmail(
-      email: email,
-    ); // Reset‑Mail.[web:83]
+    return _firebaseAuth.sendPasswordResetEmail(email: email);
   }
 
   @override
   Future<void> signOut() {
-    return _firebaseAuth.signOut(); // Logout.[web:83]
+    return _firebaseAuth.signOut();
   }
 
   @override
   Stream<UserModel?> authStateChanges() {
     return _firebaseAuth.authStateChanges().map(
       (user) => user == null ? null : UserModel.fromFirebase(user),
-    ); // User‑Stream.[web:83]
+    );
   }
 }

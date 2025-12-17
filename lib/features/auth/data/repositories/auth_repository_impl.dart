@@ -9,7 +9,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserEntity> login(String email, String password) {
-    return remote.signIn(email, password); // Delegiert an DataSource.[web:79]
+    return remote.signIn(email, password);
   }
 
   @override
