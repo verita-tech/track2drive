@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:track2drive/features/trips/domain/entities/trip_entity.dart';
 
 import '../bloc/trip_bloc.dart';
@@ -33,15 +37,117 @@ class _TripListPageState extends State<TripListPage> {
       return '${s.day}.${s.month}.${s.year} – ${e.day}.${e.month}.${e.year}';
     }
     if (_filterYear != null && _filterMonth != null) {
-      return '$_filterMonth/$_filterYear';
+      return '${_filterMonth!.toString().padLeft(2, '0')}.$_filterYear';
     }
     return 'Alle Fahrten';
+  }
+
+  List<Trip> _getFilteredTrips(TripState state) {
+    var trips = state.trips;
+
+    if (_filterYear != null && _filterMonth != null && _range == null) {
+      trips = trips
+          .where(
+            (t) => t.date.year == _filterYear && t.date.month == _filterMonth,
+          )
+          .toList();
+    }
+
+    if (_range != null) {
+      final start = DateTime(
+        _range!.start.year,
+        _range!.start.month,
+        _range!.start.day,
+      );
+      final end = DateTime(
+        _range!.end.year,
+        _range!.end.month,
+        _range!.end.day,
+        23,
+        59,
+      );
+
+      trips = trips
+          .where((t) => !t.date.isBefore(start) && !t.date.isAfter(end))
+          .toList();
+    }
+
+    return trips;
+  }
+
+  Future<void> _exportTrips(BuildContext context, TripState state) async {
+    final trips = _getFilteredTrips(state);
+    if (trips.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Keine Fahrten im gewählten Zeitraum')),
+      );
+      return;
+    }
+
+    String fileName;
+    if (_range != null) {
+      final s = _range!.start;
+      final e = _range!.end;
+      fileName =
+          'fahrten_${s.year}-${s.month.toString().padLeft(2, '0')}-${s.day.toString().padLeft(2, '0')}_'
+          '${e.year}-${e.month.toString().padLeft(2, '0')}-${e.day.toString().padLeft(2, '0')}.csv';
+    } else if (_filterYear != null && _filterMonth != null) {
+      fileName =
+          'fahrten_$_filterYear-${_filterMonth!.toString().padLeft(2, '0')}.csv';
+    } else {
+      fileName = 'fahrten_alle.csv';
+    }
+
+    final double totalKm = trips.fold<double>(
+      0,
+      (sum, t) => sum + t.distanceKm,
+    );
+
+    final buffer = StringBuffer();
+    buffer.writeln('Datum;Kilometer;Ziel/Begründung');
+    for (final t in trips) {
+      buffer.writeln(
+        '${t.date.toIso8601String()};'
+        '${t.distanceKm.toStringAsFixed(1)};'
+        '${t.destination} ${t.purpose}',
+      );
+    }
+
+    buffer.writeln();
+    buffer.writeln('Summe;${totalKm.toStringAsFixed(1)};');
+
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/$fileName');
+    await file.writeAsString(buffer.toString());
+
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(file.path, name: fileName)],
+        text: 'Fahrtenexport ($_filterLabel)',
+        subject: 'Fahrtenexport',
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Fahrten')),
+      appBar: AppBar(
+        title: const Text('Fahrten'),
+        actions: [
+          BlocBuilder<TripBloc, TripState>(
+            builder: (context, state) {
+              final disabled =
+                  state.status == TripStatus.loading || state.trips.isEmpty;
+              return IconButton(
+                icon: const Icon(Icons.ios_share),
+                tooltip: 'Exportieren',
+                onPressed: disabled ? null : () => _exportTrips(context, state),
+              );
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Material(
@@ -75,7 +181,6 @@ class _TripListPageState extends State<TripListPage> {
               ),
             ),
           ),
-
           Expanded(
             child: BlocBuilder<TripBloc, TripState>(
               builder: (context, state) {
@@ -90,34 +195,7 @@ class _TripListPageState extends State<TripListPage> {
                   );
                 }
 
-                var trips = state.trips;
-
-                if (_filterYear != null && _filterMonth != null) {
-                  trips = trips.where((t) {
-                    return t.date.year == _filterYear &&
-                        t.date.month == _filterMonth;
-                  }).toList();
-                }
-
-                if (_range != null) {
-                  final start = DateTime(
-                    _range!.start.year,
-                    _range!.start.month,
-                    _range!.start.day,
-                  );
-                  final end = DateTime(
-                    _range!.end.year,
-                    _range!.end.month,
-                    _range!.end.day,
-                    23,
-                    59,
-                  );
-
-                  trips = trips.where((t) {
-                    final d = t.date;
-                    return !d.isBefore(start) && !d.isAfter(end);
-                  }).toList();
-                }
+                final trips = _getFilteredTrips(state);
 
                 if (trips.isEmpty) {
                   return const Center(
@@ -178,8 +256,10 @@ class _TripListPageState extends State<TripListPage> {
                         value: tempMonth,
                         items: List.generate(12, (i) => i + 1)
                             .map(
-                              (m) =>
-                                  DropdownMenuItem(value: m, child: Text('$m')),
+                              (m) => DropdownMenuItem(
+                                value: m,
+                                child: Text(m.toString().padLeft(2, '0')),
+                              ),
                             )
                             .toList(),
                         onChanged: (value) {
@@ -218,7 +298,6 @@ class _TripListPageState extends State<TripListPage> {
 
                   const SizedBox(height: 16),
 
-                  // Von/Bis
                   Row(
                     children: [
                       TextButton.icon(
