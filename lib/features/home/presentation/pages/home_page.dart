@@ -22,7 +22,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    final email = widget.user.email ?? 'Unbekannt';
+    final email = widget.user.email;
 
     return BlocProvider(
       create: (context) => TripBloc(
