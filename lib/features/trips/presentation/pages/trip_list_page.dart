@@ -123,7 +123,6 @@ class _TripListPageState extends State<TripListPage> {
     await SharePlus.instance.share(
       ShareParams(
         files: [XFile(file.path, name: fileName)],
-        text: 'Fahrtenexport ($_filterLabel)',
         subject: 'Fahrtenexport',
       ),
     );
