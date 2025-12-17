@@ -31,11 +31,13 @@ class AuthUserChanged extends AuthEvent {
   AuthUserChanged(this.user);
 }
 
+enum AuthInfo { resetEmailSent }
+
 class AuthState {
   final UserEntity? user;
   final bool loading;
   final String? error;
-  final String? info;
+  final AuthInfo? info;
 
   const AuthState({this.user, this.loading = false, this.error, this.info});
 
@@ -43,7 +45,7 @@ class AuthState {
     UserEntity? user,
     bool? loading,
     String? error,
-    String? info,
+    AuthInfo? info,
   }) {
     return AuthState(
       user: user ?? this.user,
@@ -119,12 +121,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(state.copyWith(loading: true, error: null, info: null));
     try {
       await _sendReset(event.email);
-      emit(
-        state.copyWith(
-          loading: false,
-          info: 'E-Mail zum Zurücksetzen wurde gesendet.',
-        ),
-      );
+      emit(state.copyWith(loading: false, info: AuthInfo.resetEmailSent));
     } catch (e) {
       emit(state.copyWith(loading: false, error: e.toString()));
     }

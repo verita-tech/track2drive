@@ -36,7 +36,7 @@ class _RegisterPageState extends State<RegisterPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Registrieren')),
+      appBar: AppBar(title: Text(l10n.register)),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state.error != null) {
@@ -58,18 +58,18 @@ class _RegisterPageState extends State<RegisterPage> {
                     children: [
                       TextFormField(
                         controller: _emailCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'E-Mail',
+                        decoration: InputDecoration(
+                          labelText: l10n.eMail,
                           prefixIcon: Icon(Icons.email),
                           border: OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'E-Mail eingeben';
+                            return l10n.enterEMail;
                           }
                           if (!value.contains('@')) {
-                            return 'Ungültige E-Mail';
+                            return l10n.invalidEMail;
                           }
                           return null;
                         },
@@ -77,8 +77,8 @@ class _RegisterPageState extends State<RegisterPage> {
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _passwordCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'Passwort',
+                        decoration: InputDecoration(
+                          labelText: l10n.password,
                           prefixIcon: Icon(Icons.lock),
                           border: OutlineInputBorder(),
                         ),
@@ -101,15 +101,15 @@ class _RegisterPageState extends State<RegisterPage> {
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _passwordRepeatCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'Passwort wiederholen',
+                        decoration: InputDecoration(
+                          labelText: l10n.repeatPassword,
                           prefixIcon: Icon(Icons.lock_outline),
                           border: OutlineInputBorder(),
                         ),
                         obscureText: true,
                         validator: (value) {
                           if (value != _passwordCtrl.text) {
-                            return 'Passwörter stimmen nicht überein';
+                            return l10n.passwordsNotMatching;
                           }
                           return null;
                         },
@@ -125,7 +125,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text('Account erstellen'),
+                            : Text(l10n.createAccount),
                       ),
                     ],
                   ),

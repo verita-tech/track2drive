@@ -43,4 +43,25 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get noAccountRegister => 'Keinen Account? Registrieren.';
+
+  @override
+  String get register => 'Registrieren';
+
+  @override
+  String get repeatPassword => 'Passwort wiederholen';
+
+  @override
+  String get passwordsNotMatching => 'Passwörter stimmen nicht überein';
+
+  @override
+  String get createAccount => 'Account erstellen';
+
+  @override
+  String get enterEmailForReset => 'Geben Sie Ihre E-Mail ein, um einen Link zum Zurücksetzen zu erhalten.';
+
+  @override
+  String get sendResetLink => 'Link senden';
+
+  @override
+  String get resetEmailSentMessage => 'An email to reset the settings has been sent.';
 }

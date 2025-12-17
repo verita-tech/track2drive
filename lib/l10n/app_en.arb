@@ -10,5 +10,12 @@
   "passwordSecurity": "Minimum 10 characters, special character, number, uppercase and lowercase letters",
   "forgotPassword": "Forgot password",
   "login": "Login",
-  "noAccountRegister": "No account? Register"
+  "noAccountRegister": "No account? Register",
+  "register": "Register",
+  "repeatPassword": "Repeat password",
+  "passwordsNotMatching": "Passwords not matching",
+  "createAccount": "Create Account",
+  "enterEmailForReset": "Enter your email address to receive a reset link.",
+  "sendResetLink":  "Send link",
+  "resetEmailSentMessage": "An email to reset the settings has been sent."
 }

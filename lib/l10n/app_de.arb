@@ -10,5 +10,12 @@
   "passwordSecurity": "Mindestens 10 Zeichen, Sonderzeichen, Zahl, Groß- und Kleinbuchstaben",
   "forgotPassword": "Passwort vergessen",
   "login": "Login",
-  "noAccountRegister": "Keinen Account? Registrieren."
+  "noAccountRegister": "Keinen Account? Registrieren.",
+  "register": "Registrieren",
+  "repeatPassword": "Passwort wiederholen",
+  "passwordsNotMatching": "Passwörter stimmen nicht überein",
+  "createAccount": "Account erstellen",
+  "enterEmailForReset": "Geben Sie Ihre E-Mail ein, um einen Link zum Zurücksetzen zu erhalten.",
+  "sendResetLink":  "Link senden",
+  "resetEmailSentMessage": "E-Mail zum Zurücksetzen wurde gesendet."
 }

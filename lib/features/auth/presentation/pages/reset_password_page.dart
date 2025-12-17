@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:track2drive/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:track2drive/l10n/app_localizations.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -28,8 +29,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Passwort zurücksetzen')),
+      appBar: AppBar(title: Text(l10n.forgotPassword)),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state.error != null) {
@@ -40,7 +43,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           if (state.info != null) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(SnackBar(content: Text(state.info!)));
+            ).showSnackBar(SnackBar(content: Text(l10n.resetEmailSentMessage)));
           }
         },
         builder: (context, state) {
@@ -54,25 +57,25 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        'Gib deine E-Mail ein, um einen Link zum Zurücksetzen zu erhalten.',
+                      Text(
+                        l10n.enterEmailForReset,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _emailCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'E-Mail',
+                        decoration: InputDecoration(
+                          labelText: l10n.eMail,
                           prefixIcon: Icon(Icons.email),
                           border: OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'E-Mail eingeben';
+                            return l10n.enterEMail;
                           }
                           if (!value.contains('@')) {
-                            return 'Ungültige E-Mail';
+                            return l10n.invalidEMail;
                           }
                           return null;
                         },
@@ -88,7 +91,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text('Link senden'),
+                            : Text(l10n.sendResetLink),
                       ),
                     ],
                   ),

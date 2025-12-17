@@ -166,6 +166,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No account? Register'**
   String get noAccountRegister;
+
+  /// No description provided for @register.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get register;
+
+  /// No description provided for @repeatPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat password'**
+  String get repeatPassword;
+
+  /// No description provided for @passwordsNotMatching.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords not matching'**
+  String get passwordsNotMatching;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccount;
+
+  /// No description provided for @enterEmailForReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email address to receive a reset link.'**
+  String get enterEmailForReset;
+
+  /// No description provided for @sendResetLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Send link'**
+  String get sendResetLink;
+
+  /// No description provided for @resetEmailSentMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'An email to reset the settings has been sent.'**
+  String get resetEmailSentMessage;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
