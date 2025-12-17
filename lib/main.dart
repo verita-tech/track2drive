@@ -5,11 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:track2drive/features/auth/domain/entities/user_entity.dart';
-
 import 'package:track2drive/l10n/app_localizations.dart';
 import 'firebase_options_dev.dart' as dev;
-
-// Data + Domain + Presentation
 import 'package:track2drive/features/auth/data/datasources/firebase_auth_datasource.dart';
 import 'package:track2drive/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:track2drive/features/auth/domain/usecases/login_usecase.dart';
@@ -25,22 +22,17 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   const String flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
   final firebaseOptions = _getFirebaseOptions(flavor);
-  await Firebase.initializeApp(
-    options: firebaseOptions,
-  ); // Init Firebase.[web:2]
+  await Firebase.initializeApp(options: firebaseOptions);
 
-  // Data layer
   final firebaseAuth = FirebaseAuth.instance;
   final dataSource = FirebaseAuthDataSourceImpl(firebaseAuth);
   final authRepository = AuthRepositoryImpl(dataSource);
 
-  // Domain layer
   final loginUsecase = LoginUseCase(authRepository);
   final registerUsecase = RegisterUseCase(authRepository);
   final sendResetUsecase = SendResetEmailUseCase(authRepository);
   final logoutUsecase = LogoutUseCase(authRepository);
 
-  // Auth-Stream aus Repository
   final authStateStream = authRepository.authStateChanges();
 
   runApp(
