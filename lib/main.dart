@@ -26,6 +26,12 @@ import 'package:track2drive/features/trips/domain/usecases/update_trip_usecase.d
 import 'package:track2drive/features/trips/domain/usecases/delete_trip_usecase.dart';
 import 'package:track2drive/features/trips/domain/usecases/watch_trips_usecase.dart';
 
+// ===== AUTO TRACKING IMPORTS =====
+import 'package:track2drive/features/auto_tracking/data/datasources/auto_tracking_remote_datasource.dart';
+import 'package:track2drive/features/auto_tracking/data/repositories/auto_tracking_repository_impl.dart';
+import 'package:track2drive/features/auto_tracking/domain/usecases/watch_auto_tracking_rule.dart';
+import 'package:track2drive/features/auto_tracking/domain/usecases/save_auto_tracking_rule.dart';
+
 enum AppEnv { dev, staging, prod }
 
 Future<void> main() async {
@@ -53,6 +59,14 @@ Future<void> main() async {
   final deleteTripUsecase = DeleteTripUsecase(tripRepository);
   final watchTripsUsecase = WatchTripsUsecase(tripRepository);
 
+  // ===== AUTO TRACKING SETUP =====
+  final autoTrackingDatasource = AutoTrackingRemoteDataSourceImpl(firestore);
+  final autoTrackingRepository = AutoTrackingRepositoryImpl(
+    autoTrackingDatasource,
+  );
+  final watchAutoTrackingRule = WatchAutoTrackingRule(autoTrackingRepository);
+  final saveAutoTrackingRule = SaveAutoTrackingRule(autoTrackingRepository);
+
   runApp(
     MainApp(
       flavor: flavor,
@@ -65,6 +79,9 @@ Future<void> main() async {
       updateTripUsecase: updateTripUsecase,
       deleteTripUsecase: deleteTripUsecase,
       watchTripsUsecase: watchTripsUsecase,
+      // ===== AUTO TRACKING PARAMETER =====
+      watchAutoTrackingRule: watchAutoTrackingRule,
+      saveAutoTrackingRule: saveAutoTrackingRule,
     ),
   );
 }
@@ -83,6 +100,10 @@ class MainApp extends StatelessWidget {
   final DeleteTripUsecase deleteTripUsecase;
   final WatchTripsUsecase watchTripsUsecase;
 
+  // ===== AUTO TRACKING PARAMETER =====
+  final WatchAutoTrackingRule watchAutoTrackingRule;
+  final SaveAutoTrackingRule saveAutoTrackingRule;
+
   const MainApp({
     super.key,
     required this.flavor,
@@ -95,6 +116,8 @@ class MainApp extends StatelessWidget {
     required this.updateTripUsecase,
     required this.deleteTripUsecase,
     required this.watchTripsUsecase,
+    required this.watchAutoTrackingRule,
+    required this.saveAutoTrackingRule,
   });
 
   @override
@@ -112,6 +135,14 @@ class MainApp extends StatelessWidget {
         RepositoryProvider<UpdateTripUsecase>.value(value: updateTripUsecase),
         RepositoryProvider<DeleteTripUsecase>.value(value: deleteTripUsecase),
         RepositoryProvider<WatchTripsUsecase>.value(value: watchTripsUsecase),
+
+        // ===== AUTO TRACKING PROVIDER =====
+        RepositoryProvider<WatchAutoTrackingRule>.value(
+          value: watchAutoTrackingRule,
+        ),
+        RepositoryProvider<SaveAutoTrackingRule>.value(
+          value: saveAutoTrackingRule,
+        ),
       ],
       child: BlocProvider(
         create: (_) => AuthBloc(

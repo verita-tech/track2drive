@@ -13,6 +13,11 @@ import 'package:track2drive/features/trips/domain/usecases/update_trip_usecase.d
 import 'package:track2drive/features/trips/domain/usecases/delete_trip_usecase.dart';
 import 'package:track2drive/features/trips/domain/usecases/watch_trips_usecase.dart';
 
+import 'package:track2drive/features/settings/presentation/pages/settings_page.dart';
+import 'package:track2drive/features/auto_tracking/domain/usecases/watch_auto_tracking_rule.dart';
+import 'package:track2drive/features/auto_tracking/domain/usecases/save_auto_tracking_rule.dart';
+import 'package:track2drive/features/auto_tracking/presentation/bloc/auto_tracking_bloc.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.user});
   final UserEntity user;
@@ -26,21 +31,39 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final email = widget.user.email;
 
-    return BlocProvider(
-      create: (context) => TripBloc(
-        userId: widget.user.id,
-        watchTrips: context.read<WatchTripsUsecase>(),
-        createTrip: context.read<CreateTripUsecase>(),
-        updateTrip: context.read<UpdateTripUsecase>(),
-        deleteTrip: context.read<DeleteTripUsecase>(),
-      )..add(const TripSubscriptionRequested()),
-      child: _HomeScaffold(email: email),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => TripBloc(
+            userId: widget.user.id,
+            watchTrips: context.read<WatchTripsUsecase>(),
+            createTrip: context.read<CreateTripUsecase>(),
+            updateTrip: context.read<UpdateTripUsecase>(),
+            deleteTrip: context.read<DeleteTripUsecase>(),
+          )..add(const TripSubscriptionRequested()),
+        ),
+        // ===== AUTO TRACKING BLOC =====
+        BlocProvider(
+          create: (context) => AutoTrackingBloc(
+            watchRule: context.read<WatchAutoTrackingRule>(),
+            saveRule: context.read<SaveAutoTrackingRule>(),
+          ),
+        ),
+      ],
+      child: _HomeScaffold(
+        userId: widget.user.id, // ← user.id statt email!
+        email: email,
+      ),
     );
   }
 }
 
 class _HomeScaffold extends StatefulWidget {
-  const _HomeScaffold({required this.email});
+  const _HomeScaffold({
+    required this.userId, // ← NEU: userId für Settings
+    required this.email,
+  });
+  final String userId;
   final String email;
 
   @override
@@ -54,7 +77,6 @@ class _HomeScaffoldState extends State<_HomeScaffold> {
   Widget build(BuildContext context) {
     final pages = <Widget>[
       HomeDashboard(
-        // ohne Unterstrich, siehe Klasse unten
         email: widget.email,
         onShowAllTrips: () {
           setState(() => _selectedIndex = 1);
@@ -63,7 +85,8 @@ class _HomeScaffoldState extends State<_HomeScaffold> {
       const TripListPage(),
       const Center(child: Text('Kostenstellenverwaltung (coming soon)')),
       const Center(child: Text('Fahrzeugverwaltung (coming soon)')),
-      const Center(child: Text('Einstellungen (coming soon)')),
+      // ===== SETTINGS PAGE (Index 4) =====
+      SettingsPage(userId: widget.userId),
     ];
 
     return Scaffold(
