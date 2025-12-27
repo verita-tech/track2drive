@@ -44,29 +44,29 @@ class AutoTrackingRuleModel {
   }
 
   AutoTrackingRule toEntity() {
-    TimeOfDay _fromMinutes(int m) => TimeOfDay(hour: m ~/ 60, minute: m % 60);
+    TimeOfDay fromMinutes(int m) => TimeOfDay(hour: m ~/ 60, minute: m % 60);
 
     return AutoTrackingRule(
       id: id,
       bluetoothDeviceId: bluetoothDeviceId,
       bluetoothDeviceName: bluetoothDeviceName,
       weekdays: weekdays.toSet(),
-      startTime: _fromMinutes(startMinutes),
-      endTime: _fromMinutes(endMinutes),
+      startTime: fromMinutes(startMinutes),
+      endTime: fromMinutes(endMinutes),
       enabled: enabled,
     );
   }
 
   static AutoTrackingRuleModel fromEntity(AutoTrackingRule e) {
-    int _toMinutes(TimeOfDay t) => t.hour * 60 + t.minute;
+    int toMinutes(TimeOfDay t) => t.hour * 60 + t.minute;
 
     return AutoTrackingRuleModel(
       id: e.id,
       bluetoothDeviceId: e.bluetoothDeviceId,
       bluetoothDeviceName: e.bluetoothDeviceName,
       weekdays: e.weekdays.toList(),
-      startMinutes: _toMinutes(e.startTime),
-      endMinutes: _toMinutes(e.endTime),
+      startMinutes: toMinutes(e.startTime),
+      endMinutes: toMinutes(e.endTime),
       enabled: e.enabled,
     );
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class BluetoothDeviceSelector extends StatefulWidget {
   final String? currentDeviceId;
@@ -20,8 +20,8 @@ class BluetoothDeviceSelector extends StatefulWidget {
 }
 
 class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
-  BluetoothConnection? _connection;
-  List<BluetoothDevice> _devices = [];
+  final List<ScanResult> _scanResults =
+      []; // ← ScanResult statt BluetoothDevice
   bool _isScanning = false;
 
   @override
@@ -40,30 +40,49 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
   }
 
   Future<void> _scanDevices() async {
-    setState(() => _isScanning = true);
-    _devices.clear();
+    setState(() {
+      _isScanning = true;
+      _scanResults.clear();
+    });
 
-    FlutterBluetoothSerial.instance
-        .startDiscovery()
-        .listen((r) {
-          setState(() {
-            _devices.add(r.device);
-          });
-        })
-        .onDone(() {
-          setState(() => _isScanning = false);
+    // ✅ flutter_blue_plus API
+    await FlutterBluePlus.startScan(timeout: const Duration(seconds: 8));
+
+    // Listen to scan results
+    FlutterBluePlus.scanResults.listen((results) {
+      if (mounted) {
+        setState(() {
+          _scanResults.addAll(results);
         });
+      }
+    });
+
+    // Stop scan
+    await Future.delayed(const Duration(seconds: 8));
+    await FlutterBluePlus.stopScan();
+
+    if (mounted) {
+      setState(() => _isScanning = false);
+    }
   }
 
   Future<void> _connectToDevice(BluetoothDevice device) async {
     try {
-      _connection = await BluetoothConnection.toAddress(device.address);
-      widget.onDeviceSelected(device.address, device.name);
-      _connection?.close();
+      // Kein echtes Connect nötig - nur ID speichern
+      widget.onDeviceSelected(device.remoteId.str, device.platformName);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${device.platformName ?? 'Gerät'} ausgewählt!'),
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Verbindung fehlgeschlagen: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Fehler: $e')));
+      }
     }
   }
 
@@ -96,6 +115,8 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
               ],
             ),
             const SizedBox(height: 12),
+
+            // Aktuelles Gerät
             if (widget.currentDeviceName != null) ...[
               Container(
                 padding: const EdgeInsets.all(12),
@@ -134,12 +155,15 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
               ),
               const SizedBox(height: 16),
             ],
+
+            // Gefundene Geräte
             OutlinedButton.icon(
               onPressed: _isScanning ? null : () => _showDevicesDialog(),
               icon: const Icon(Icons.search),
               label: Text(widget.currentDeviceName ?? 'Gerät aus Liste wählen'),
             ),
-            if (_devices.isNotEmpty)
+
+            if (_scanResults.isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(top: 12),
                 padding: const EdgeInsets.all(12),
@@ -152,8 +176,8 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${_devices.length} Gerät${_devices.length != 1 ? 'e' : ''} gefunden',
-                      style: TextStyle(
+                      '${_scanResults.length} Gerät${_scanResults.length != 1 ? 'e' : ''} gefunden',
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -162,21 +186,22 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
                     SizedBox(
                       height: 200,
                       child: ListView.builder(
-                        itemCount: _devices.length,
+                        itemCount: _scanResults.length,
                         itemBuilder: (context, index) {
-                          final device = _devices[index];
+                          final result = _scanResults[index];
+                          final device = result.device;
                           final isSelected =
-                              widget.currentDeviceId == device.address;
+                              widget.currentDeviceId == device.remoteId.str;
+
                           return ListTile(
                             dense: true,
-                            leading: Icon(
-                              isSelected
-                                  ? Icons.bluetooth_connected
-                                  : Icons.bluetooth,
-                              color: isSelected ? Colors.green : null,
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.blue[100],
+                              radius: 16,
+                              child: Text('${result.rssi}'),
                             ),
-                            title: Text(device.name ?? 'Unbekannt'),
-                            subtitle: Text(device.address),
+                            title: Text(device.platformName ?? 'Unbekannt'),
+                            subtitle: Text(device.remoteId.str),
                             trailing: isSelected
                                 ? const Icon(Icons.check, color: Colors.green)
                                 : IconButton(
@@ -207,16 +232,23 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
         content: SizedBox(
           width: double.maxFinite,
           height: 300,
-          child: _devices.isEmpty
-              ? const Center(child: Text('Keine Geräte gefunden'))
+          child: _scanResults.isEmpty
+              ? const Center(
+                  child: Text('Keine Geräte gefunden. Bitte "Suchen" drücken.'),
+                )
               : ListView.builder(
-                  itemCount: _devices.length,
+                  itemCount: _scanResults.length,
                   itemBuilder: (context, index) {
-                    final device = _devices[index];
+                    final result = _scanResults[index];
+                    final device = result.device;
                     return ListTile(
-                      leading: const Icon(Icons.bluetooth),
-                      title: Text(device.name ?? 'Unbekannt'),
-                      subtitle: Text(device.address),
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.blue[100],
+                        radius: 16,
+                        child: Text('${result.rssi}'),
+                      ),
+                      title: Text(device.platformName ?? 'Unbekannt'),
+                      subtitle: Text(device.remoteId.str),
                       onTap: () {
                         _connectToDevice(device);
                         Navigator.pop(ctx);
