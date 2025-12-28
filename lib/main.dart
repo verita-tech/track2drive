@@ -134,14 +134,14 @@ class MainApp extends StatelessWidget {
           locale: const Locale('en'),
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.deepPurple,
+              seedColor: Colors.blue,
               brightness: Brightness.light,
             ),
             useMaterial3: true,
           ),
           darkTheme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.deepPurple,
+              seedColor: Colors.blue,
               brightness: Brightness.dark,
             ),
             useMaterial3: true,
