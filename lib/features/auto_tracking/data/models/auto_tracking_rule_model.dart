@@ -25,27 +25,26 @@ class AutoTrackingRuleModel {
       id: id,
       bluetoothDeviceId: json['bluetoothDeviceId'] as String?,
       bluetoothDeviceName: json['bluetoothDeviceName'] as String?,
-      weekdays: List<int>.from(json['weekdays'] ?? const <int>[]),
+      weekdays: List<int>.from(
+        json['weekdays'] ?? const <int>[],
+      ), // ✅ Type Safety
       startMinutes: json['startMinutes'] as int? ?? 8 * 60,
       endMinutes: json['endMinutes'] as int? ?? 18 * 60,
       enabled: json['enabled'] as bool? ?? false,
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'bluetoothDeviceId': bluetoothDeviceId,
-      'bluetoothDeviceName': bluetoothDeviceName,
-      'weekdays': weekdays,
-      'startMinutes': startMinutes,
-      'endMinutes': endMinutes,
-      'enabled': enabled,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'bluetoothDeviceId': bluetoothDeviceId,
+    'bluetoothDeviceName': bluetoothDeviceName,
+    'weekdays': weekdays,
+    'startMinutes': startMinutes,
+    'endMinutes': endMinutes,
+    'enabled': enabled,
+  };
 
   AutoTrackingRule toEntity() {
     TimeOfDay fromMinutes(int m) => TimeOfDay(hour: m ~/ 60, minute: m % 60);
-
     return AutoTrackingRule(
       id: id,
       bluetoothDeviceId: bluetoothDeviceId,
@@ -59,7 +58,6 @@ class AutoTrackingRuleModel {
 
   static AutoTrackingRuleModel fromEntity(AutoTrackingRule e) {
     int toMinutes(TimeOfDay t) => t.hour * 60 + t.minute;
-
     return AutoTrackingRuleModel(
       id: e.id,
       bluetoothDeviceId: e.bluetoothDeviceId,

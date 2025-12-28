@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class BluetoothDeviceSelector extends StatefulWidget {
   final String? currentDeviceId;
@@ -20,68 +20,46 @@ class BluetoothDeviceSelector extends StatefulWidget {
 }
 
 class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
-  final List<ScanResult> _scanResults =
-      []; // ← ScanResult statt BluetoothDevice
-  bool _isScanning = false;
+  List<BluetoothDevice> _bondedDevices = [];
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _requestPermissions();
+    _requestPermissionsAndLoadBonded();
   }
 
-  Future<void> _requestPermissions() async {
+  Future<void> _requestPermissionsAndLoadBonded() async {
     await [
       Permission.bluetooth,
       Permission.bluetoothConnect,
       Permission.bluetoothScan,
       Permission.location,
     ].request();
+
+    await _getBondedDevices();
   }
 
-  Future<void> _scanDevices() async {
-    setState(() {
-      _isScanning = true;
-      _scanResults.clear();
-    });
+  Future<void> _getBondedDevices() async {
+    setState(() => _isLoading = true);
 
-    // ✅ flutter_blue_plus API
-    await FlutterBluePlus.startScan(timeout: const Duration(seconds: 8));
-
-    // Listen to scan results
-    FlutterBluePlus.scanResults.listen((results) {
+    try {
+      // ✅ Alle GEPAAREN Geräte laden
+      final bondedDevices = await FlutterBluePlus.bondedDevices;
       if (mounted) {
         setState(() {
-          _scanResults.addAll(results);
+          _bondedDevices = bondedDevices;
         });
-      }
-    });
-
-    // Stop scan
-    await Future.delayed(const Duration(seconds: 8));
-    await FlutterBluePlus.stopScan();
-
-    if (mounted) {
-      setState(() => _isScanning = false);
-    }
-  }
-
-  Future<void> _connectToDevice(BluetoothDevice device) async {
-    try {
-      // Kein echtes Connect nötig - nur ID speichern
-      widget.onDeviceSelected(device.remoteId.str, device.platformName);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${device.platformName ?? 'Gerät'} ausgewählt!'),
-          ),
-        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Fehler: $e')));
+        ).showSnackBar(SnackBar(content: Text('Fehler beim Laden: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -94,39 +72,52 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header + Refresh
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Bluetooth-Gerät',
+                  'Bluetooth-Gerät (gepaart)',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
-                ElevatedButton.icon(
-                  onPressed: _isScanning ? null : _scanDevices,
-                  icon: _isScanning
+                TextButton.icon(
+                  onPressed: _isLoading ? null : _getBondedDevices,
+                  icon: _isLoading
                       ? const SizedBox(
                           width: 16,
                           height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Icon(Icons.refresh),
-                  label: Text(_isScanning ? 'Scanne...' : 'Suchen'),
+                      : const Icon(Icons.refresh, size: 16),
+                  label: Text(_isLoading ? 'Laden...' : 'Aktualisieren'),
                 ),
               ],
             ),
             const SizedBox(height: 12),
 
-            // Aktuelles Gerät
+            // ✅ AKTUELLES GERÄT (aus Firebase)
             if (widget.currentDeviceName != null) ...[
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.green[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.green[200]!),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.bluetooth_connected, color: Colors.green),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.green[100],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(
+                        Icons.bluetooth_connected,
+                        color: Colors.green,
+                        size: 20,
+                      ),
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -134,7 +125,10 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
                         children: [
                           Text(
                             widget.currentDeviceName!,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
                           ),
                           Text(
                             widget.currentDeviceId!,
@@ -147,7 +141,7 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete),
+                      icon: const Icon(Icons.delete_outline),
                       onPressed: () => widget.onDeviceSelected(null, null),
                     ),
                   ],
@@ -156,64 +150,129 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
               const SizedBox(height: 16),
             ],
 
-            // Gefundene Geräte
-            OutlinedButton.icon(
-              onPressed: _isScanning ? null : () => _showDevicesDialog(),
-              icon: const Icon(Icons.search),
-              label: Text(widget.currentDeviceName ?? 'Gerät aus Liste wählen'),
-            ),
-
-            if (_scanResults.isNotEmpty)
+            // ✅ GEPAARTE GERÄTE LISTE
+            if (_bondedDevices.isNotEmpty)
               Container(
-                margin: const EdgeInsets.only(top: 12),
-                padding: const EdgeInsets.all(12),
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[300]!),
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blue[200]!),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '${_scanResults.length} Gerät${_scanResults.length != 1 ? 'e' : ''} gefunden',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    Row(
+                      children: [
+                        Icon(Icons.link, color: Colors.blue[700], size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${_bondedDevices.length} gepaart${_bondedDevices.length != 1 ? 'e' : ''} Gerät${_bondedDevices.length != 1 ? 'e' : ''}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.blue[800],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     SizedBox(
-                      height: 200,
+                      height: 220,
                       child: ListView.builder(
-                        itemCount: _scanResults.length,
+                        itemCount: _bondedDevices.length,
                         itemBuilder: (context, index) {
-                          final result = _scanResults[index];
-                          final device = result.device;
+                          final device = _bondedDevices[index];
                           final isSelected =
                               widget.currentDeviceId == device.remoteId.str;
 
-                          return ListTile(
-                            dense: true,
-                            leading: CircleAvatar(
-                              backgroundColor: Colors.blue[100],
-                              radius: 16,
-                              child: Text('${result.rssi}'),
-                            ),
-                            title: Text(device.platformName ?? 'Unbekannt'),
-                            subtitle: Text(device.remoteId.str),
-                            trailing: isSelected
-                                ? const Icon(Icons.check, color: Colors.green)
-                                : IconButton(
-                                    icon: const Icon(
-                                      Icons.connect_without_contact,
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            color: isSelected ? Colors.green[50] : null,
+                            child: ListTile(
+                              dense: true,
+                              contentPadding: const EdgeInsets.all(12),
+                              leading: CircleAvatar(
+                                radius: 18,
+                                backgroundColor: Colors.blue[100],
+                                child: Icon(
+                                  Icons.phone_android,
+                                  color: Colors.blue[700],
+                                  size: 18,
+                                ),
+                              ),
+                              title: Text(
+                                device.platformName ?? 'Unbekannt',
+                                style: TextStyle(
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  color: isSelected ? Colors.green[800] : null,
+                                ),
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Text(
+                                  device.remoteId.str,
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              ),
+                              trailing: isSelected
+                                  ? const Icon(
+                                      Icons.check_circle,
+                                      color: Colors.green,
+                                      size: 24,
+                                    )
+                                  : const Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: 16,
+                                      color: Colors.grey,
                                     ),
-                                    onPressed: () => _connectToDevice(device),
-                                  ),
-                            onTap: () => _connectToDevice(device),
+                              onTap: () => _selectDevice(device),
+                            ),
                           );
                         },
                       ),
+                    ),
+                  ],
+                ),
+              )
+            else if (!_isLoading)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.orange[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.orange[200]!),
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: Colors.orange[700],
+                      size: 48,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Keine gepaarten Geräte',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Geräte zuerst in den System-Bluetooth-Einstellungen koppeln\n(z.B. Auto, Kopfhörer)',
+                      style: TextStyle(fontSize: 14, color: Colors.orange[800]),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton.icon(
+                      onPressed: () => openAppSettings(),
+                      icon: const Icon(Icons.settings),
+                      label: const Text('Zu Bluetooth-Einstellungen'),
                     ),
                   ],
                 ),
@@ -224,46 +283,23 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
     );
   }
 
-  void _showDevicesDialog() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Verfügbare Geräte'),
-        content: SizedBox(
-          width: double.maxFinite,
-          height: 300,
-          child: _scanResults.isEmpty
-              ? const Center(
-                  child: Text('Keine Geräte gefunden. Bitte "Suchen" drücken.'),
-                )
-              : ListView.builder(
-                  itemCount: _scanResults.length,
-                  itemBuilder: (context, index) {
-                    final result = _scanResults[index];
-                    final device = result.device;
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.blue[100],
-                        radius: 16,
-                        child: Text('${result.rssi}'),
-                      ),
-                      title: Text(device.platformName ?? 'Unbekannt'),
-                      subtitle: Text(device.remoteId.str),
-                      onTap: () {
-                        _connectToDevice(device);
-                        Navigator.pop(ctx);
-                      },
-                    );
-                  },
-                ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Abbrechen'),
+  void _selectDevice(BluetoothDevice device) {
+    widget.onDeviceSelected(device.remoteId.str, device.platformName);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle, color: Colors.green),
+              const SizedBox(width: 12),
+              Text(
+                '${device.platformName ?? 'Gerät'} für Auto-Tracking ausgewählt!',
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+          backgroundColor: Colors.green[50],
+        ),
+      );
+    }
   }
 }
