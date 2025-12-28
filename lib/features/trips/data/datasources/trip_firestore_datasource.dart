@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:injectable/injectable.dart';
 import '../models/trip_model.dart';
 
 abstract class TripFirestoreDatasource {
@@ -8,6 +9,7 @@ abstract class TripFirestoreDatasource {
   Future<void> deleteTrip(String userId, String tripId);
 }
 
+@Injectable(as: TripFirestoreDatasource)
 class TripFirestoreDatasourceImpl implements TripFirestoreDatasource {
   TripFirestoreDatasourceImpl(this._firestore);
 

@@ -34,13 +34,9 @@ class _HomePageState extends State<HomePage> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => TripBloc(
-            userId: widget.user.id,
-            watchTrips: context.read<WatchTripsUsecase>(),
-            createTrip: context.read<CreateTripUsecase>(),
-            updateTrip: context.read<UpdateTripUsecase>(),
-            deleteTrip: context.read<DeleteTripUsecase>(),
-          )..add(const TripSubscriptionRequested()),
+          create: (context) =>
+              TripBloc(userId: widget.user.id)
+                ..add(const TripSubscriptionRequested()),
         ),
         // ===== AUTO TRACKING BLOC =====
         BlocProvider(

@@ -1,6 +1,8 @@
+import 'package:injectable/injectable.dart';
 import '../entities/trip_entity.dart';
 import '../repositories/trip_repository.dart';
 
+@Injectable()
 class WatchTripsUsecase {
   WatchTripsUsecase(this._repository);
 

@@ -1,5 +1,7 @@
+import 'package:injectable/injectable.dart';
 import '../repositories/trip_repository.dart';
 
+@Injectable()
 class DeleteTripUsecase {
   DeleteTripUsecase(this._repository);
 

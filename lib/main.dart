@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:track2drive/di/injection.dart';
 
 import 'package:track2drive/features/auth/domain/entities/user_entity.dart';
 import 'package:track2drive/l10n/app_localizations.dart';
@@ -19,13 +20,6 @@ import 'package:track2drive/features/auth/domain/usecases/send_reset_email_useca
 import 'package:track2drive/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:track2drive/features/auth/presentation/pages/auth_gate.dart';
 
-import 'package:track2drive/features/trips/data/datasources/trip_firestore_datasource.dart';
-import 'package:track2drive/features/trips/data/repositories/trip_repository_impl.dart';
-import 'package:track2drive/features/trips/domain/usecases/create_trip_usecase.dart';
-import 'package:track2drive/features/trips/domain/usecases/update_trip_usecase.dart';
-import 'package:track2drive/features/trips/domain/usecases/delete_trip_usecase.dart';
-import 'package:track2drive/features/trips/domain/usecases/watch_trips_usecase.dart';
-
 // ===== AUTO TRACKING IMPORTS =====
 import 'package:track2drive/features/auto_tracking/data/datasources/auto_tracking_remote_datasource.dart';
 import 'package:track2drive/features/auto_tracking/data/repositories/auto_tracking_repository_impl.dart';
@@ -39,6 +33,7 @@ Future<void> main() async {
   const String flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
   final firebaseOptions = _getFirebaseOptions(flavor);
   await Firebase.initializeApp(options: firebaseOptions);
+  await configureDependencies();
 
   final firebaseAuth = FirebaseAuth.instance;
   final authDataSource = FirebaseAuthDataSourceImpl(firebaseAuth);
@@ -51,13 +46,6 @@ Future<void> main() async {
   final authStateStream = authRepository.authStateChanges();
 
   final firestore = FirebaseFirestore.instance;
-  final tripDatasource = TripFirestoreDatasourceImpl(firestore);
-  final tripRepository = TripRepositoryImpl(tripDatasource);
-
-  final createTripUsecase = CreateTripUsecase(tripRepository);
-  final updateTripUsecase = UpdateTripUsecase(tripRepository);
-  final deleteTripUsecase = DeleteTripUsecase(tripRepository);
-  final watchTripsUsecase = WatchTripsUsecase(tripRepository);
 
   // ===== AUTO TRACKING SETUP =====
   final autoTrackingDatasource = AutoTrackingRemoteDataSourceImpl(firestore);
@@ -75,10 +63,6 @@ Future<void> main() async {
       sendResetEmailUseCase: sendResetUsecase,
       logoutUseCase: logoutUsecase,
       authStateStream: authStateStream,
-      createTripUsecase: createTripUsecase,
-      updateTripUsecase: updateTripUsecase,
-      deleteTripUsecase: deleteTripUsecase,
-      watchTripsUsecase: watchTripsUsecase,
       // ===== AUTO TRACKING PARAMETER =====
       watchAutoTrackingRule: watchAutoTrackingRule,
       saveAutoTrackingRule: saveAutoTrackingRule,
@@ -95,11 +79,6 @@ class MainApp extends StatelessWidget {
   final LogoutUseCase logoutUseCase;
   final Stream<UserEntity?> authStateStream;
 
-  final CreateTripUsecase createTripUsecase;
-  final UpdateTripUsecase updateTripUsecase;
-  final DeleteTripUsecase deleteTripUsecase;
-  final WatchTripsUsecase watchTripsUsecase;
-
   // ===== AUTO TRACKING PARAMETER =====
   final WatchAutoTrackingRule watchAutoTrackingRule;
   final SaveAutoTrackingRule saveAutoTrackingRule;
@@ -112,10 +91,6 @@ class MainApp extends StatelessWidget {
     required this.sendResetEmailUseCase,
     required this.logoutUseCase,
     required this.authStateStream,
-    required this.createTripUsecase,
-    required this.updateTripUsecase,
-    required this.deleteTripUsecase,
-    required this.watchTripsUsecase,
     required this.watchAutoTrackingRule,
     required this.saveAutoTrackingRule,
   });
@@ -130,11 +105,6 @@ class MainApp extends StatelessWidget {
           value: sendResetEmailUseCase,
         ),
         RepositoryProvider<LogoutUseCase>.value(value: logoutUseCase),
-
-        RepositoryProvider<CreateTripUsecase>.value(value: createTripUsecase),
-        RepositoryProvider<UpdateTripUsecase>.value(value: updateTripUsecase),
-        RepositoryProvider<DeleteTripUsecase>.value(value: deleteTripUsecase),
-        RepositoryProvider<WatchTripsUsecase>.value(value: watchTripsUsecase),
 
         // ===== AUTO TRACKING PROVIDER =====
         RepositoryProvider<WatchAutoTrackingRule>.value(

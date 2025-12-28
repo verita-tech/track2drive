@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:track2drive/di/injection.dart';
 import 'package:track2drive/features/trips/domain/entities/trip_entity.dart';
 import 'package:track2drive/features/trips/domain/usecases/create_trip_usecase.dart';
 import 'package:track2drive/features/trips/domain/usecases/delete_trip_usecase.dart';
@@ -10,27 +11,17 @@ part 'trip_event.dart';
 part 'trip_state.dart';
 
 class TripBloc extends Bloc<TripEvent, TripState> {
-  TripBloc({
-    required this.userId,
-    required WatchTripsUsecase watchTrips,
-    required CreateTripUsecase createTrip,
-    required UpdateTripUsecase updateTrip,
-    required DeleteTripUsecase deleteTrip,
-  }) : _watchTrips = watchTrips,
-       _createTrip = createTrip,
-       _updateTrip = updateTrip,
-       _deleteTrip = deleteTrip,
-       super(const TripState.initial()) {
+  TripBloc({required this.userId}) : super(const TripState.initial()) {
     on<TripSubscriptionRequested>(_onSubscriptionRequested);
     on<TripSubmitted>(_onSubmitted);
     on<TripDeleted>(_onDeleted);
   }
 
   final String userId;
-  final WatchTripsUsecase _watchTrips;
-  final CreateTripUsecase _createTrip;
-  final UpdateTripUsecase _updateTrip;
-  final DeleteTripUsecase _deleteTrip;
+  late final WatchTripsUsecase _watchTrips = sl<WatchTripsUsecase>();
+  late final CreateTripUsecase _createTrip = sl<CreateTripUsecase>();
+  late final UpdateTripUsecase _updateTrip = sl<UpdateTripUsecase>();
+  late final DeleteTripUsecase _deleteTrip = sl<DeleteTripUsecase>();
 
   Future<void> _onSubscriptionRequested(
     TripSubscriptionRequested event,

@@ -1,8 +1,10 @@
+import 'package:injectable/injectable.dart';
 import '../../domain/entities/trip_entity.dart';
 import '../../domain/repositories/trip_repository.dart';
 import '../datasources/trip_firestore_datasource.dart';
 import '../models/trip_model.dart';
 
+@Injectable(as: TripRepository)
 class TripRepositoryImpl implements TripRepository {
   TripRepositoryImpl(this._datasource);
 
